@@ -1,0 +1,176 @@
+------SELLERS----------------
+
+POST//Create a new sellers
+AUTH - NONE
+ROUTE - http://localHost:PORT/api/sellers
+
+***Requests**
+
+-password
+-email
+-name
+-banner(file)
+-storeName
+-cityId(objectID)
+-contact
+-originId(objectID)
+-description
+-[menuId](objectID)
+
+**RESPONSE***
+CODE - 201 
+HEADER - JWT TOKEN(seller Id)
+
+-storeName
+-city
+-origin
+-description
+-menuId
+-stars
+-------------------------------------------------------------------------
+
+GET//GETTING ALL SELLERS 
+
+AUTH - NONE
+
+ROUTE - http://localHost:PORT/api/sellers
+
+**REQUESTS***
+NONE
+
+**RESPONSE**
+STATUS(200)
+-storeName
+-city(poplated)
+-contact
+-origin(populated)
+-description
+-[menu](populated)
+-stars
+-rating average
+
+------------------------------------------------------------------
+
+GET//GETTING SPECIFIC SELLER 
+
+AUTH - NONE
+
+ROUTE - http://localHost:PORT/api/sellers/:Id
+
+**REQUESTS***
+    -Id(params)
+
+**RESPONSE**
+STATUS(200)
+-storeName
+-city(poplated)
+-contact
+-origin(populated)
+-description
+-[menu](populated)
+-stars
+-rating average
+
+------------------------------------------------------------------
+
+GET // GETTING SELLER BANNER IMG
+
+AUTH - NONE
+
+ROUTE - http://localHost:PORT/api/sellers/banner/:sellerId
+
+**REQUESTS***
+-sellerId(params)
+
+**RESPONSE**
+STATUS(200)
+DATA - IMAGE
+
+---------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+PATCH//  EXCEPT MENU || EXCEPT BANNER || EXCPET REVIEWS
+
+AUTH - LOGGED IN 
+
+ROUTE - http://localHost:PORT/api/sellers/:sellerId
+
+
+ ANYOTHER(
+    **REQUESTS***
+    -sellerId(params)
+    -anyother
+
+    **RESPONSE***
+    STATUS(201)
+    DATA-SELLER('banner': 0,
+                'password': 0,
+                'email': 0,
+                )
+    )
+ ----------------------------------------------
+ 
+PATCH// MENU // adding a menu to a sellers profile 
+
+AUTH - LOGGED IN 
+
+ROUTE - http://localHost:PORT/api/sellers/menu
+
+    **REQUESTS***
+    -sellerId
+    -menuId
+
+    **RESPONSE***
+    STATUS(201)
+    DATA-SELLER('banner': 0,
+                'password': 0,
+                'email': 0,
+                )
+    
+ ----------------------------------------------
+
+PATCH// MENU // adding a menu to a sellers profile 
+
+AUTH - LOGGED IN 
+
+ROUTE - http://localHost:PORT/api/sellers/rating/:sellerId
+
+    **REQUESTS***
+    -sellerId(params)
+    -stars(1-5)
+
+    **RESPONSE***
+    STATUS(201)
+    DATA-SELLER('stars')
+    
+ -----------------------------------------------------------
+
+PATCH// DELETING A MENU
+
+AUTH - LOGGIN IN
+
+ROUTE - http://localHost:PORT/api/sellers/delete-menu/:sellerId
+
+**REQUESTS***
+-sellerId(params)
+-menuIndex
+
+**RESPONSE**
+STATUS(200)
+DATA - 'menu Deleted'
+
+
+---------------------------------
+DELETE// DELETING SELLER 
+
+AUTH - LOGGIN IN, ADMIN
+
+ROUTE - http://localHost:PORT/api/sellers/sellerId
+
+**REQUESTS***
+-sellerId(params)
+
+**RESPONSE**
+STATUS(200)
+DATA - 'seller Deleted'
