@@ -34,6 +34,7 @@ const schema = new mongoose.Schema({
   storeName: {
     type: String,
     required: true,
+    unique: true,
   },
   storeNotes: [
     {
