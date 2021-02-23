@@ -165,6 +165,25 @@ router.patch("/banner", sellerAuth, async (req, res) => {
   }
 });
 
+router.patch("./pictures/food2Certificate", async (req, res) => {
+  try {
+    let foodHygiene2Certificate = req.files.foodHygiene2Certificate;
+
+    foodHygiene2Certificate.mv(
+      "./pictures/foodHygiene2Certificate/" + req.body._id,
+      function (err) {
+        if (err) {
+          res.send(err);
+        } else {
+          res.status(202).send("picture Saved");
+        }
+      }
+    );
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 //adding a menu
 router.patch("/menu", sellerAuth, async (req, res) => {
   try {
