@@ -98,6 +98,23 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  legal: {
+    termsAndConditions: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    kitchenContract: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    foodHygiene2Certificate: {
+      type: Boolean,
+      required: true,
+      default: false, //should only be set to true when the certificate has bee revied by us
+    },
+  },
 });
 
 schema.methods.generateJwtToken = function () {
