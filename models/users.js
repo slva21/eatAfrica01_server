@@ -88,19 +88,27 @@ const schema = new mongoose.Schema({
       //user can save multiple addresses
       postcode: {
         type: String,
+        required: true,
       },
       addressLine1: {
         type: String,
+        required: true,
       },
       addressLine2: {
         type: String,
       },
       city: {
-        type: String,
+        type: mongoose.Types.ObjectId,
+        ref: "Cities",
+        required: true,
       },
-      town: {
-        type: String,
-      },
+      nearKitchens: [
+        //kitchen already found to be near to this address
+        {
+          type: mongoose.Types.ObjectId,
+          ref: "Sellers",
+        },
+      ],
     },
   ],
 });

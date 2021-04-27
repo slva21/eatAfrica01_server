@@ -171,21 +171,22 @@ router.get("/nearSellers/:userId/:addressIndex", async (req, res) => {
       }
 
       if (distances.status == "OK") {
-        // distance.rows[0].elements[0].forEach((element) => {
-        //   kitchenDistances.push(element.distance.value);
-        // });
-        return res.status(200).json(distances);
+        let elements = distances.rows[0].elements;
+
+        elements.forEach((element) => {
+          kitchenDistances.push(element.distance.value);
+        });
+
+        //filter kitchen too far out of the sellers array
+        kitchenDistances.forEach((x) => {
+          if (parseInt(x) > 1000) {
+            sellers.splice(kitchenDistances.indexOf(x), 1);
+          }
+        });
+
+        res.status(200).json(sellers);
       }
     });
-
-    // //filter kitchen too far out of the sellers array
-    // kitchenDistances.forEach((x) => {
-    //   if (x > 3000) {
-    //     sellers.splice(kitchenDistances.indexOf(x), 1);
-    //   }
-    // });
-
-    // res.status(200).json(sellers);
   } catch (err) {
     console.log(err.message);
   }
