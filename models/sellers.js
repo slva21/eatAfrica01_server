@@ -18,12 +18,19 @@ const schema = new mongoose.Schema({
     unique: true,
   },
   address: {
-    addressLine1: String,
-    addressLine2: String,
+    addressLine1: {
+      type: String,
+      required: true,
+    },
+    addressLine2: {
+      type: String,
+      required: true,
+    },
     postcode: {
       type: String,
+      required: true,
       minlength: 6,
-      maxlength: 6,
+      maxlength: 7, //incase of space
     },
   },
 
