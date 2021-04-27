@@ -4,7 +4,6 @@ const router = express.Router();
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
 const { Orders } = require("../models/orders");
-const { forEach } = require("lodash");
 
 router.post("/", async (req, res) => {
   try {
@@ -91,6 +90,28 @@ router.get("/orders/:_id", async (req, res) => {
     // });
 
     res.status(200).json(orders);
+  } catch (err) {
+    console.log(err.message);
+  }
+});
+
+router.patch("/address", async (req, res) => {
+  try {
+    let user = await Users.findById(req.body.userId);
+
+    if (!user) return res.status(404).json("no user found");
+
+    let newAddress = {
+      postcode: req.body.address.postcode,
+      addressLine1: req.body.address.addressLine1,
+      addressLine2: req.body.address.addressLine2,
+      city: req.body.address.cityId,
+    };
+
+    user.address.push(newAddress);
+    await user.save();
+
+    res.status(201).json(newAddress);
   } catch (err) {
     console.log(err.message);
   }
