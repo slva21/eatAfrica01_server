@@ -1,12 +1,10 @@
 const express = require("express");
 const distance = require("distance-matrix-api");
 const _ = require("lodash");
-const fileUpload = require("express-fileupload");
 const ObjectID = require("mongodb").ObjectID;
 const fs = require("fs");
 const { Sellers } = require("../models/sellers");
 const sellerAuth = require("../middleware/sellerAuth");
-const { Mongoose } = require("mongoose");
 const { Orders } = require("../models/orders");
 const { Users } = require("../models/users");
 
