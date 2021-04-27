@@ -101,10 +101,12 @@ router.get("/", async (req, res) => {
 });
 
 //requires user id,
-router.get("/distance_matrix", async (req, res) => {
+router.get("/nearSellers/:userId/:addressIndex", async (req, res) => {
   try {
     //find the user
-    const user = await Users.findById(req.body.userId).populate(address.city);
+    const user = await Users.findById(req.params.userId).populate(
+      "address.city"
+    );
 
     //if no user
     if (!user) {
@@ -112,7 +114,7 @@ router.get("/distance_matrix", async (req, res) => {
     }
 
     //pick the current user address
-    const queryAddress = user.address[req.body.addressIndex];
+    const queryAddress = user.address[req.params.addressIndex];
 
     //find the sellers
     let sellers = await Sellers.find(
@@ -169,20 +171,21 @@ router.get("/distance_matrix", async (req, res) => {
       }
 
       if (distances.status == "OK") {
-        distance.rows[0].elements[0].forEach((element) => {
-          kitchenDistances.push(element.distance.value);
-        });
+        // distance.rows[0].elements[0].forEach((element) => {
+        //   kitchenDistances.push(element.distance.value);
+        // });
+        return res.status(200).json(distances);
       }
     });
 
-    //filter kitchen too far out of the sellers array
-    kitchenDistances.forEach((x) => {
-      if (x > 30) {
-        sellers.splice(kitchenDistances.indexOf(x), 1);
-      }
-    });
+    // //filter kitchen too far out of the sellers array
+    // kitchenDistances.forEach((x) => {
+    //   if (x > 3000) {
+    //     sellers.splice(kitchenDistances.indexOf(x), 1);
+    //   }
+    // });
 
-    res.status(200).json(sellers);
+    // res.status(200).json(sellers);
   } catch (err) {
     console.log(err.message);
   }
@@ -429,6 +432,25 @@ router.patch("/deleteStoreNote/:id", sellerAuth, async (req, res) => {
     res.status(200).send(seller.storeNotes);
   } catch (err) {
     console.log(err);
+  }
+});
+
+//update sellers address(does not include city)
+router.patch("/address/edit", async (req, res) => {
+  try {
+    const seller = await Sellers.findById(req.body.sellerId);
+
+    if (!seller) return res.status(404).json("no seller found");
+
+    seller.address = req.body.address;
+
+    let address = seller.address;
+
+    await seller.save();
+
+    res.status(201).json(address);
+  } catch (err) {
+    console.log(err.message);
   }
 });
 
