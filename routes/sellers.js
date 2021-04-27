@@ -100,13 +100,26 @@ router.get("/", async (req, res) => {
   }
 });
 
-//requires user id,
+//get nearby sellers to users address(optimsed for less future searches)
 router.get("/nearSellers/:userId/:addressIndex", async (req, res) => {
   try {
     //find the user
-    const user = await Users.findById(req.params.userId).populate(
-      "address.city"
-    );
+    const user = await Users.findById(req.params.userId)
+      .populate("address.city")
+      .populate({
+        path: "address.nearKitchens",
+        populate: [
+          {
+            path: "menu",
+          },
+          {
+            path: "city",
+          },
+          {
+            path: "origin",
+          },
+        ],
+      });
 
     //if no user
     if (!user) {
@@ -125,11 +138,31 @@ router.get("/nearSellers/:userId/:addressIndex", async (req, res) => {
       }
     )
       .populate("city")
-      .populate("origin", ["path", "name", "_id"])
+      .populate("origin")
       .populate("menu");
 
     if (!sellers) {
       return res.status(404).send("No sellers found");
+    }
+
+    //filter the sellers out not in the near sellers list allready
+
+    let unKnownSellers = [];
+
+    sellers.forEach((seller) => {
+      const x = queryAddress.nearKitchens.find(
+        (kitchen) => kitchen._id.toString() == seller._id.toString()
+      );
+
+      if (!x) {
+        unKnownSellers.push(seller);
+      }
+    });
+
+    //if no new unkowns sellers where found.
+    if (unKnownSellers.length == 0) {
+      res.status(200).json(queryAddress.nearKitchens);
+      return;
     }
 
     //create an orgin address from the users address
@@ -146,7 +179,7 @@ router.get("/nearSellers/:userId/:addressIndex", async (req, res) => {
     let queryKitchens = [];
 
     //add each sellers address to the destination query list
-    sellers.forEach((seller) => {
+    unKnownSellers.forEach((seller) => {
       let queryAddress =
         seller.address.addressLine1 +
         ", " +
@@ -161,8 +194,8 @@ router.get("/nearSellers/:userId/:addressIndex", async (req, res) => {
 
     let kitchenDistances = [];
 
-    //perform distance check
-    distance.matrix(origin, queryKitchens, function (err, distances) {
+    //perform distance check on unkownkitchens
+    distance.matrix(origin, queryKitchens, async function (err, distances) {
       if (err) {
         return console.log(err);
       }
@@ -177,14 +210,26 @@ router.get("/nearSellers/:userId/:addressIndex", async (req, res) => {
           kitchenDistances.push(element.distance.value);
         });
 
-        //filter kitchen too far out of the sellers array
+        //filter kitchen too far out of the unkownsellers array
         kitchenDistances.forEach((x) => {
           if (parseInt(x) > 1000) {
-            sellers.splice(kitchenDistances.indexOf(x), 1);
+            unKnownSellers.splice(kitchenDistances.indexOf(x), 1);
           }
         });
 
-        res.status(200).json(sellers);
+        let finalSellers = queryAddress.nearKitchens.concat(unKnownSellers);
+
+        //send the list to the user
+        res.status(200).json(finalSellers);
+
+        //add kitchens to near kitchens
+        if (unKnownSellers.length != 0) {
+          unKnownSellers.forEach(({ _id }) => {
+            queryAddress.nearKitchens.push(_id);
+          });
+        }
+
+        await user.save();
       }
     });
   } catch (err) {
