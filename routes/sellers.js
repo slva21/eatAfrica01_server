@@ -1,4 +1,5 @@
 const express = require("express");
+const distance = require("distance-matrix-api");
 const _ = require("lodash");
 const fileUpload = require("express-fileupload");
 const ObjectID = require("mongodb").ObjectID;
@@ -7,10 +8,15 @@ const { Sellers } = require("../models/sellers");
 const sellerAuth = require("../middleware/sellerAuth");
 const { Mongoose } = require("mongoose");
 const { Orders } = require("../models/orders");
+const { Users } = require("../models/users");
 
 const stripe = require("stripe")(
   "sk_test_51HQJy6BM729ohvyiwM2urlGwhJ3qrtBoWpwPytnxQCqFCbxhGo03Efrm8xUcN2spYM1qaOa9uWch74W1ne3CElc300B7UjCrtR"
 );
+
+distance.key("AlphaDMAAvuZEVoH8ZRs9xFNRoMxkWYx7aRoz0t2");
+distance.units("metric");
+distance.mode("driving");
 
 const router = express.Router();
 require("dotenv/config");
@@ -89,6 +95,94 @@ router.get("/", async (req, res) => {
     }
 
     res.status(200).send(sellers);
+  } catch (err) {
+    console.log(err.message);
+  }
+});
+
+//requires user id,
+router.get("/distance_matrix", async (req, res) => {
+  try {
+    //find the user
+    const user = await Users.findById(req.body.userId).populate(address.city);
+
+    //if no user
+    if (!user) {
+      return res.status(404).send("No user found");
+    }
+
+    //pick the current user address
+    const queryAddress = user.address[req.body.addressIndex];
+
+    //find the sellers
+    let sellers = await Sellers.find(
+      { city: queryAddress.city },
+      {
+        password: 0,
+        email: 0,
+      }
+    )
+      .populate("city")
+      .populate("origin", ["path", "name", "_id"])
+      .populate("menu");
+
+    if (!sellers) {
+      return res.status(404).send("No sellers found");
+    }
+
+    //create an orgin address from the users address
+    const origin = [
+      queryAddress.addressLine1 +
+        ", " +
+        queryAddress.city.name +
+        " " +
+        queryAddress.postcode +
+        " " +
+        "UK",
+    ];
+
+    let queryKitchens = [];
+
+    //add each sellers address to the destination query list
+    sellers.forEach((seller) => {
+      let queryAddress =
+        seller.address.addressLine1 +
+        ", " +
+        seller.city.name +
+        " " +
+        seller.address.postcode +
+        " " +
+        "UK";
+
+      queryKitchens.push(queryAddress);
+    });
+
+    let kitchenDistances = [];
+
+    //perform distance check
+    distance.matrix(origin, queryKitchens, function (err, distances) {
+      if (err) {
+        return console.log(err);
+      }
+      if (!distances) {
+        return console.log("no distances");
+      }
+
+      if (distances.status == "OK") {
+        distance.rows[0].elements[0].forEach((element) => {
+          kitchenDistances.push(element.distance.value);
+        });
+      }
+    });
+
+    //filter kitchen too far out of the sellers array
+    kitchenDistances.forEach((x) => {
+      if (x > 30) {
+        sellers.splice(kitchenDistances.indexOf(x), 1);
+      }
+    });
+
+    res.status(200).json(sellers);
   } catch (err) {
     console.log(err.message);
   }

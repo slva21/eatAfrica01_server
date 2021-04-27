@@ -16,6 +16,7 @@
     "crypto": "^1.0.1",
     "cryptr": "^6.0.2",
     "date-and-time": "^0.14.2",
+    "distance-matrix-api": "^1.0.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.0",
