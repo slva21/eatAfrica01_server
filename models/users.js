@@ -9,11 +9,11 @@ const schema = new mongoose.Schema({
     minlength: 5,
     required: true,
   },
-  // contact: {
-  //   type: Number,
-  //   maxlength: 11,
-  //   required: true,
-  // },
+  phone: {
+    type: Number,
+    maxlength: 11,
+    required: true,
+  },
   email: {
     type: String,
     required: true,
@@ -28,6 +28,12 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+
+  coupons: [
+    {
+      type: String,
+    },
+  ],
 
   cart: {
     total: {
@@ -120,6 +126,8 @@ schema.methods.generateJwtToken = function () {
         _id: this.id,
         isAdmin: this.isAdmin,
         name: this.name,
+        phone: this.phone,
+        address: this.address,
       },
       cart: this.cart,
     },

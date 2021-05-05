@@ -117,4 +117,21 @@ router.patch("/address", async (req, res) => {
   }
 });
 
+//name or phone
+router.patch("/edit", async (req, res) => {
+  try {
+    let user = await Users.findByIdAndUpdate(req.body.userId, {
+      phone: req.body.phone,
+      name: req.body.name,
+    });
+    if (!user) return res.status(404).json("no user found");
+
+    res.status(201).json("Saved");
+
+    await user.save();
+  } catch (err) {
+    console.log(err.message);
+  }
+});
+
 module.exports = router;
