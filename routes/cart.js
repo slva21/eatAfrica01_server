@@ -186,6 +186,7 @@ router.get("/populate/:id", async (req, res) => {
     if (!user) {
       res.status(404).send("User not found");
     }
+    console.log(user.cart.items);
 
     //manually populate the current options
     user.cart.items.forEach(({ menu }) => {

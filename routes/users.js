@@ -102,10 +102,10 @@ router.patch("/address", async (req, res) => {
     if (!user) return res.status(404).json("no user found");
 
     let newAddress = {
-      postcode: req.body.address.postcode,
-      addressLine1: req.body.address.addressLine1,
-      addressLine2: req.body.address.addressLine2,
-      city: req.body.address.cityId,
+      postcode: req.body.postcode,
+      addressLine1: req.body.addressLine1,
+      addressLine2: req.body.addressLine2,
+      city: req.body.cityId,
     };
 
     user.address.push(newAddress);
