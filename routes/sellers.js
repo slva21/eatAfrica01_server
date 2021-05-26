@@ -231,7 +231,7 @@ router.get("/nearSellers/:userId/:addressIndex", async (req, res) => {
       }
     });
   } catch (err) {
-    console.log(err.message);
+    console.log(err);
   }
 });
 

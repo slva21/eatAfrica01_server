@@ -31,9 +31,12 @@ const schema = new mongoose.Schema({
   items: [
     {
       menu: {
-        _id: {
+        _id: { 
           type: mongoose.Types.ObjectId,
           ref: "Menus", //do not use to retreive orders as menus can be edited
+        },
+        __v: {
+          type: Number,
         },
         populatedOptions: [
           {

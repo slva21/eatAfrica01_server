@@ -15,8 +15,8 @@ router.get("/accountlink/:sellerId", async (req, res) => {
 
     const accountLinks = await stripe.accountLinks.create({
       account: seller.stripeId,
-      refresh_url: "http://192.168.0.62:3000/mykitchen/edit",
-      return_url: "http://192.168.0.62:3000/mykitchen/edit",
+      refresh_url: "http://192.168.0.47:3000/mykitchen/edit",
+      return_url: "http://192.168.0.47:3000/mykitchen/edit",
       type: "account_onboarding",
     });
 
@@ -110,8 +110,8 @@ router.post("/createSession", async (req, res) => {
           destination: seller.stripeId,
         },
       },
-      success_url: `http://172.20.10.2:3000/complete/${req.body.orderId}`,
-      cancel_url: "http://192.168.0.62:3000/cart",
+      success_url: `http://192.168.0.47:3000/complete/${req.body.orderId}`,
+      cancel_url: "http://192.168.0.47:3000/cart",
     });
 
     res.status(200).send(session);
